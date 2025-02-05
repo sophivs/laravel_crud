@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Application\UseCases\Auth\RegisterUserUseCase;
 use App\Application\UseCases\Auth\LoginUserUseCase;
 use App\Application\UseCases\Auth\LogoutUserUseCase;
-use Illuminate\Http\Request;
+use OpenApi\Annotations as OA;
 
 class AuthController extends Controller
 {
@@ -23,6 +25,24 @@ class AuthController extends Controller
         $this->logoutUserUseCase = $logoutUserUseCase;
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/register",
+     *     summary="Register a new user",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "email", "password"},
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret123")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="User registered successfully"),
+     *     @OA\Response(response=400, description="Validation error")
+     * )
+     */
     public function register(Request $request)
     {
         $request->validate([
@@ -34,6 +54,23 @@ class AuthController extends Controller
         return response()->json($this->registerUserUseCase->execute($request->all()), 201);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/login",
+     *     summary="User login",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email", "password"},
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret123")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Login successful"),
+     *     @OA\Response(response=401, description="Invalid credentials")
+     * )
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -44,6 +81,31 @@ class AuthController extends Controller
         return response()->json($this->loginUserUseCase->execute($request->all()));
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/logout",
+     *     summary="User logout",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"user"},
+     *             @OA\Property(property="user", type="object", example={"id":1})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logout realizado com sucesso",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Logout realizado com sucesso")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Usuário não autenticado"
+     *     )
+     * )
+     */
     public function logout(Request $request)
     {
         $this->logoutUserUseCase->execute($request->user());
