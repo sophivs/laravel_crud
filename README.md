@@ -1,13 +1,13 @@
 # Teste Prático Laravel - API de Tarefas
 
 ## 📌 Sobre o Projeto
-Esta é uma API RESTful desenvolvida em **Laravel 10+** para gerenciar um sistema de tarefas. 
+Esta é uma API RESTful desenvolvida em **Laravel 10** para gerenciar um sistema de tarefas. 
 O sistema permite a autenticação de usuários, gerenciamento de tarefas e categorias, além de funcionalidades como filtragem e ordenação.
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
-- **Laravel 10+**
+- **Laravel 10**
 - **Laravel Sanctum** (Autenticação JWT)
 - **Eloquent ORM**
 - **Banco de Dados: MySQL ou SQLite**
