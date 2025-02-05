@@ -1,66 +1,149 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Teste Prático Laravel - API de Tarefas
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📌 Sobre o Projeto
+Esta é uma API RESTful desenvolvida em **Laravel 10+** para gerenciar um sistema de tarefas. 
+O sistema permite a autenticação de usuários, gerenciamento de tarefas e categorias, além de funcionalidades como filtragem e ordenação.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Tecnologias Utilizadas
+- **Laravel 10+**
+- **Laravel Sanctum** (Autenticação JWT)
+- **Eloquent ORM**
+- **Banco de Dados: MySQL ou SQLite**
+- **Testes: PHPUnit / Pest**
+- **Docker (opcional)**
+- **Swagger (opcional, para documentação da API)**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ⚙️ Instalação e Execução
+### 1️⃣ Clonar o Repositório
+```sh
+git clone https://github.com/sophivs/laravel_crud.git
+cd laravel_crud
+```
 
-## Learning Laravel
+### 2️⃣ Instalar Dependências
+```sh
+composer install
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 3️⃣ Configurar o Banco de Dados
+Renomeie o arquivo **.env.example** para **.env** e configure as credenciais do banco:
+```ini
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=teste_pratico
+DB_USERNAME=root
+DB_PASSWORD=sua_senha
+```
+Se preferir SQLite:
+```ini
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+```
+Crie o arquivo SQLite:
+```sh
+touch database/database.sqlite
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 4️⃣ Gerar a Chave da Aplicação
+```sh
+php artisan key:generate
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 5️⃣ Rodar as Migrações e Seeders
+```sh
+php artisan migrate --seed
+```
+Isso criará as tabelas e populará o banco com dados iniciais.
 
-## Laravel Sponsors
+### 6️⃣ Iniciar o Servidor
+```sh
+php artisan serve
+```
+A API estará disponível em **http://127.0.0.1:8000/api**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+---
 
-### Premium Partners
+## 🔥 Endpoints Disponíveis
+### 1️⃣ Autenticação
+| Método | Rota         | Descrição |
+|--------|-------------|------------|
+| POST   | /register   | Registro de novo usuário |
+| POST   | /login      | Login do usuário |
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+**Exemplo de Requisição (Registro):**
+```json
+{
+  "name": "João Silva",
+  "email": "joao@email.com",
+  "password": "123456",
+  "password_confirmation": "123456"
+}
+```
 
-## Contributing
+### 2️⃣ Tarefas
+| Método | Rota          | Descrição |
+|--------|--------------|------------|
+| GET    | /tasks       | Listar todas as tarefas do usuário autenticado |
+| POST   | /tasks       | Criar uma nova tarefa |
+| GET    | /tasks/{id}  | Obter detalhes de uma tarefa |
+| PUT    | /tasks/{id}  | Atualizar uma tarefa |
+| DELETE | /tasks/{id}  | Deletar uma tarefa |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**Exemplo de Requisição (Criar Tarefa):**
+```json
+{
+  "title": "Comprar mantimentos",
+  "description": "Leite, pão e ovos",
+  "category_id": 1,
+  "status": "pendente"
+}
+```
 
-## Code of Conduct
+### 3️⃣ Categorias
+| Método | Rota         | Descrição |
+|--------|-------------|------------|
+| GET    | /categories | Listar todas as categorias |
+| POST   | /categories | Criar uma nova categoria |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🗂️ Scripts de Migração e Seeders
+Criação do banco de dados e população com dados iniciais:
+```sh
+php artisan migrate --seed
+```
+Os seeders criam categorias e um usuário padrão para testes.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🧪 Testes
+Para rodar os testes automatizados:
+```sh
+php artisan test
+```
+Isso valida funcionalidades como autenticação e manipulação de tarefas.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## 📄 Documentação da API (Opcional)
+Se o Swagger estiver configurado, gere a documentação com:
+```sh
+php artisan l5-swagger:generate
+```
+Acesse em **http://127.0.0.1:8000/api/documentation**.
+
+---
+
+## 🛠️ Possíveis Melhorias
+- Criar um sistema de notificação para tarefas
+- Implementar caching para otimizar a API
+
+---
+
+## 📌 Autor
+Sophia Victória Santos - Desenvolvedor PHP/Laravel
