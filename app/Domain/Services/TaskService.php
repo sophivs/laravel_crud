@@ -4,6 +4,7 @@ namespace App\Domain\Services;
 
 use App\Domain\Repositories\TaskRepositoryInterface;
 use App\Domain\Models\Task;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -16,15 +17,31 @@ class TaskService
         $this->taskRepository = $taskRepository;
     }
 
-    public function createTask(array $data): Task
+    public function createTask(array $data): ?Task
     {
-        $data['user_id'] = Auth::id();
-        return $this->taskRepository->create($data);
+        try {
+            $data['user_id'] = Auth::id();
+            return $this->taskRepository->create($data);
+        } catch (QueryException $e) {
+            throw ValidationException::withMessages(['error' => 'Verifique se a categoria inserida existe']);
+        }
     }
 
     public function getUserTasks(): array
     {
         return $this->taskRepository->findByUserId(Auth::id())->toArray();
+    }
+
+    public function getUserTask($id): Task
+    {
+        $task = $this->taskRepository->findById($id);
+
+        if (!$task || !$task->isOwnedBy(Auth::id())) {
+            throw ValidationException::withMessages(['error' => 'Tarefa não encontrada ou acesso negado']);
+        }
+
+        return $task;
+
     }
 
     public function updateTask(int $id, array $data): Task
@@ -35,7 +52,11 @@ class TaskService
             throw ValidationException::withMessages(['error' => 'Tarefa não encontrada ou acesso negado']);
         }
 
-        return $this->taskRepository->update($task, $data);
+        try {
+            return $this->taskRepository->update($task, $data);
+        } catch (QueryException $e) {
+            throw ValidationException::withMessages(['error' => 'Verifique se a categoria inserida existe']);
+        }
     }
 
     public function deleteTask(int $id): void

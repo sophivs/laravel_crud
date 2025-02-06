@@ -2,15 +2,14 @@
 
 namespace App\Domain\Models;
 
-class Task
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Task extends Model
 {
-    public function __construct(
-        public ?int $id,
-        public string $title,
-        public string $status,
-        public int $user_id,
-        public int $category_id
-    ) {}
+    use HasFactory;
+
+    protected $fillable = ['title', 'status', 'user_id', 'category_id'];
 
     public function isOwnedBy(int $userId): bool
     {

@@ -4,25 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Application\UseCases\Auth\RegisterUserUseCase;
-use App\Application\UseCases\Auth\LoginUserUseCase;
-use App\Application\UseCases\Auth\LogoutUserUseCase;
+use App\Domain\Services\AuthService;
 use OpenApi\Annotations as OA;
 
 class AuthController extends Controller
 {
-    private RegisterUserUseCase $registerUserUseCase;
-    private LoginUserUseCase $loginUserUseCase;
-    private LogoutUserUseCase $logoutUserUseCase;
+    private AuthService $authService;
 
     public function __construct(
-        RegisterUserUseCase $registerUserUseCase,
-        LoginUserUseCase $loginUserUseCase,
-        LogoutUserUseCase $logoutUserUseCase
+        AuthService $authService
     ) {
-        $this->registerUserUseCase = $registerUserUseCase;
-        $this->loginUserUseCase = $loginUserUseCase;
-        $this->logoutUserUseCase = $logoutUserUseCase;
+        $this->authService = $authService;
     }
 
     /**
@@ -33,10 +25,11 @@ class AuthController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name", "email", "password"},
+     *             required={"name", "email", "password", "password_confirmation"},
      *             @OA\Property(property="name", type="string", example="John Doe"),
      *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="secret123")
+     *             @OA\Property(property="password", type="string", format="password", example="secret123"),
+     *             @OA\Property(property="password_confirmation", type="string", example="secret123")
      *         )
      *     ),
      *     @OA\Response(response=201, description="User registered successfully"),
@@ -51,7 +44,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        return response()->json($this->registerUserUseCase->execute($request->all()), 201);
+        return response()->json($this->authService->register($request->all()), 201);
     }
 
     /**
@@ -78,7 +71,7 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        return response()->json($this->loginUserUseCase->execute($request->all()));
+        return response()->json($this->authService->login($request->all()));
     }
 
     /**
@@ -108,7 +101,7 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $this->logoutUserUseCase->execute($request->user());
+        $this->authService->logout($request->user());
         return response()->json(['message' => 'Logout realizado com sucesso']);
     }
 }
