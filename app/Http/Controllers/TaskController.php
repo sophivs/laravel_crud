@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Application\UseCases\Task\CreateTaskUseCase;
-use App\Application\UseCases\Task\GetUserTasksUseCase;
-use App\Application\UseCases\Task\UpdateTaskUseCase;
-use App\Application\UseCases\Task\DeleteTaskUseCase;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Domain\Services\TaskService;
+
 
 /**
  * @OA\Info(
@@ -24,21 +23,12 @@ use Illuminate\Http\Request;
  */
 class TaskController extends Controller
 {
-    private CreateTaskUseCase $createTaskUseCase;
-    private GetUserTasksUseCase $getUserTasksUseCase;
-    private UpdateTaskUseCase $updateTaskUseCase;
-    private DeleteTaskUseCase $deleteTaskUseCase;
+    private TaskService $taskService;
 
     public function __construct(
-        CreateTaskUseCase $createTaskUseCase,
-        GetUserTasksUseCase $getUserTasksUseCase,
-        UpdateTaskUseCase $updateTaskUseCase,
-        DeleteTaskUseCase $deleteTaskUseCase
+        TaskService $taskService
     ) {
-        $this->createTaskUseCase = $createTaskUseCase;
-        $this->getUserTasksUseCase = $getUserTasksUseCase;
-        $this->updateTaskUseCase = $updateTaskUseCase;
-        $this->deleteTaskUseCase = $deleteTaskUseCase;
+        $this->taskService = $taskService;
     }
 
     /**
@@ -46,12 +36,16 @@ class TaskController extends Controller
      *     path="/api/tasks",
      *     summary="Create a new task",
      *     tags={"Tasks"},
+     *     security={
+     *         {"sanctum": {}},
+     *     },
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
      *             required={"title", "category_id"},
      *             @OA\Property(property="title", type="string", example="Complete project documentation"),
-     *             @OA\Property(property="category_id", type="integer", example=1)
+     *             @OA\Property(property="category_id", type="integer", example=1),
+     *             @OA\Property(property="status", type="string", enum={"pendente", "em andamento", "concluído"}, example="pendente")
      *         )
      *     ),
      *     @OA\Response(
@@ -60,7 +54,8 @@ class TaskController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="id", type="integer", example=101),
      *             @OA\Property(property="title", type="string", example="Complete project documentation"),
-     *             @OA\Property(property="category_id", type="integer", example=1)
+     *             @OA\Property(property="category_id", type="integer", example=1),
+     *             @OA\Property(property="status", type="string", enum={"pendente", "em andamento", "concluído"}, example="pendente")
      *         )
      *     ),
      *     @OA\Response(
@@ -74,8 +69,12 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(['title' => 'required|min:5', 'category_id' => 'required']);
-        return response()->json($this->createTaskUseCase->execute($request->all()), 201);
+        $request->validate([
+            'title' => 'required|min:5',
+            'category_id' => 'required',
+            'status' => 'required|in:pendente,em andamento,concluído',
+        ]);
+        return response()->json($this->taskService->createTask($request->all()), 201);
     }
 
     /**
@@ -83,6 +82,9 @@ class TaskController extends Controller
      *     path="/api/tasks",
      *     summary="Get all tasks of the authenticated user",
      *     tags={"Tasks"},
+     *     security={
+     *         {"sanctum": {}},
+     *     },
      *     @OA\Response(
      *         response=200,
      *         description="List of user tasks",
@@ -107,15 +109,58 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return response()->json($this->getUserTasksUseCase->execute());
+        return response()->json($this->taskService->getUserTasks());
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/tasks/{id}",
+     *     summary="Get a task of the authenticated user",
+     *     tags={"Tasks"},
+     *     security={
+     *         {"sanctum": {}},
+     *     },
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User task",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Complete project documentation"),
+     *                 @OA\Property(property="category_id", type="integer", example=1)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized access",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *         )
+     *     )
+     * )
+     */
+    public function show($id)
+    {
+        return response()->json($this->taskService->getUserTask($id));
+    }
 
     /**
      * @OA\Put(
      *     path="/api/tasks/{id}",
      *     summary="Update a task",
      *     tags={"Tasks"},
+     *     security={
+     *         {"sanctum": {}},
+     *     },
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -128,7 +173,8 @@ class TaskController extends Controller
      *         @OA\JsonContent(
      *             required={"title", "category_id"},
      *             @OA\Property(property="title", type="string", example="Complete updated project documentation"),
-     *             @OA\Property(property="category_id", type="integer", example=1)
+     *             @OA\Property(property="category_id", type="integer", example=1),
+     *             @OA\Property(property="status", type="string", enum={"pendente", "em andamento", "concluído"}, example="pendente")
      *         )
      *     ),
      *     @OA\Response(
@@ -137,7 +183,8 @@ class TaskController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="id", type="integer", example=1),
      *             @OA\Property(property="title", type="string", example="Complete updated project documentation"),
-     *             @OA\Property(property="category_id", type="integer", example=1)
+     *             @OA\Property(property="category_id", type="integer", example=1),
+     *             @OA\Property(property="status", type="string", enum={"pendente", "em andamento", "concluído"}, example="pendente")
      *         )
      *     ),
      *     @OA\Response(
@@ -151,7 +198,11 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return response()->json($this->updateTaskUseCase->execute($id, $request->all()));
+        $request->validate([
+            'title' => 'min:5',
+            'status' => 'in:pendente,em andamento,concluído',
+        ]);
+        return response()->json($this->taskService->updateTask($id, $request->all()));
     }
 
 
@@ -160,6 +211,9 @@ class TaskController extends Controller
      *     path="/api/tasks/{id}",
      *     summary="Delete a task",
      *     tags={"Tasks"},
+     *     security={
+     *         {"sanctum": {}},
+     *     },
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -185,7 +239,7 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        $this->deleteTaskUseCase->execute($id);
+        $this->taskService->deleteTask($id);
         return response()->json(['message' => 'Tarefa deletada com sucesso']);
     }
 }

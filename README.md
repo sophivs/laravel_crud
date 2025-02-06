@@ -66,14 +66,19 @@ php artisan serve
 ```
 A API estará disponível em **http://127.0.0.1:8000/api**
 
+## 🔥 Endpoints Disponíveis
+
 ---
 
-## 🔥 Endpoints Disponíveis
+### 📄 Documentação da API (Opcional)
+Acesse em **http://127.0.0.1:8000/api/api-documentation**.
+
 ### 1️⃣ Autenticação
 | Método | Rota         | Descrição |
 |--------|-------------|------------|
 | POST   | /register   | Registro de novo usuário |
 | POST   | /login      | Login do usuário |
+| POST   | /logout      | Login do usuário |
 
 **Exemplo de Requisição (Registro):**
 ```json
@@ -127,15 +132,6 @@ Para rodar os testes automatizados:
 php artisan test
 ```
 Isso valida funcionalidades como autenticação e manipulação de tarefas.
-
----
-
-## 📄 Documentação da API (Opcional)
-Se o Swagger estiver configurado, gere a documentação com:
-```sh
-php artisan l5-swagger:generate
-```
-Acesse em **http://127.0.0.1:8000/api/documentation**.
 
 ---
 
