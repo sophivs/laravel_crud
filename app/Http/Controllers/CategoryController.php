@@ -76,6 +76,10 @@ class CategoryController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories'
+        ]);
+
         $category = $this->categoryService ->createCategory($request->all());
         return response()->json(['message' => 'Category created successfully', 'category' => $category], 201);
     }

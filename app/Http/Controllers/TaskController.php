@@ -82,20 +82,60 @@ class TaskController extends Controller
      *     path="/api/tasks",
      *     summary="Get all tasks of the authenticated user",
      *     tags={"Tasks"},
-     *     security={
-     *         {"sanctum": {}},
-     *     },
+     *     security={ {"sanctum": {}}, },
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filter tasks by status (pendente, em andamento, concluído)",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"pendente", "em andamento", "concluído"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="category_id",
+     *         in="query",
+     *         description="Filter tasks by category ID",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_by",
+     *         in="query",
+     *         description="Sort by field (default: created_at)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="title")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_order",
+     *         in="query",
+     *         description="Sort order (asc or desc, default: desc)",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"asc", "desc"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Number of tasks per page (default: 10)",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=10)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="List of user tasks",
      *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="title", type="string", example="Complete project documentation"),
-     *                 @OA\Property(property="category_id", type="integer", example=1)
-     *             )
+     *             type="object",
+     *             @OA\Property(property="current_page", type="integer", example=1),
+     *             @OA\Property(property="data", type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Complete project documentation"),
+     *                     @OA\Property(property="category_id", type="integer", example=1),
+     *                     @OA\Property(property="status", type="string", example="pendente"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-02-06T12:00:00Z")
+     *                 )
+     *             ),
+     *             @OA\Property(property="total", type="integer", example=50),
+     *             @OA\Property(property="per_page", type="integer", example=10),
+     *             @OA\Property(property="last_page", type="integer", example=5)
      *         )
      *     ),
      *     @OA\Response(
@@ -107,9 +147,9 @@ class TaskController extends Controller
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->taskService->getUserTasks());
+        return response()->json($this->taskService->getUserTasks($request));
     }
 
     /**
