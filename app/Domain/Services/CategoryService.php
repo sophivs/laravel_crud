@@ -3,7 +3,7 @@
 namespace App\Domain\Services;
 
 use App\Domain\Repositories\CategoryRepositoryInterface;
-use App\Domain\Models\Category;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 

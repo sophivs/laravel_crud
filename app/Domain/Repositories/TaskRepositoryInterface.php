@@ -2,7 +2,7 @@
 
 namespace App\Domain\Repositories;
 
-use App\Domain\Models\Task;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
