@@ -117,13 +117,19 @@ Acesse em **http://127.0.0.1:8000/api/api-documentation**.
 |--------|-------------|------------|
 | GET    | /categories | Listar todas as categorias |
 | POST   | /categories | Criar uma nova categoria |
+| GET    | /categories/{id}  | Obter detalhes de uma categoria |
+| PUT    | /categories/{id}  | Atualizar uma categoria |
+| DELETE | /categories/{id}  | Deletar uma categoria |
 
 ---
 
 ## 🗂️ Scripts de Migração e Seeders
 Criação do banco de dados e população com dados iniciais:
 ```sh
-php artisan migrate --seed
+php artisan migrate
+php artisan db:seed --class=UserSeeder
+php artisan db:seed --class=CategorySeeder
+php artisan db:seed --class=TaskSeeder
 ```
 Os seeders criam categorias e um usuário padrão para testes.
 
