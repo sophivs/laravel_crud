@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Repositories;
 
 use App\Domain\Repositories\TaskRepositoryInterface;
-use App\Domain\Models\Task;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
