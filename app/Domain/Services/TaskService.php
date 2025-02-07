@@ -5,6 +5,7 @@ namespace App\Domain\Services;
 use App\Domain\Repositories\TaskRepositoryInterface;
 use App\Domain\Models\Task;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -27,9 +28,9 @@ class TaskService
         }
     }
 
-    public function getUserTasks(): array
+    public function getUserTasks(Request $request): array
     {
-        return $this->taskRepository->findByUserId(Auth::id())->toArray();
+        return $this->taskRepository->findByUserId(Auth::id(), $request)->toArray();
     }
 
     public function getUserTask($id): Task

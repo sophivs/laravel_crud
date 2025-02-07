@@ -56,7 +56,10 @@ php artisan key:generate
 
 ### 5️⃣ Rodar as Migrações e Seeders
 ```sh
-php artisan migrate --seed
+php artisan migrate
+php artisan db:seed --class=UserSeeder
+php artisan db:seed --class=CategorySeeder
+php artisan db:seed --class=TaskSeeder
 ```
 Isso criará as tabelas e populará o banco com dados iniciais.
 
